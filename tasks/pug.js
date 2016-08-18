@@ -56,12 +56,20 @@ module.exports = function(grunt) {
       .forEach(function(filepath) {
         var src = processContent(grunt.file.read(filepath), filepath);
         var compiled, filename;
-        filename = processName(filepath);
+        var processableFilepath = filepath.replace(f.orig.cwd+'/', '').replace(/(\.jade|\.pug)$/, '');
+        var processableFilepathArray = processableFilepath.split('/');
+        var processableFilename = processableFilepathArray[processableFilepathArray.length - 1];
+        var filename = processName(processableFilepath, processableFilename);
+
+        if(typeof options.processName !== 'undefined'){
+          f.dest = f.orig.dest + '/' + filename + f.orig.ext;
+        }
 
         options.filename = filepath;
 
         try {
           var pug = f.orig.pug = require('pug');
+
           if (typeof data === 'function') {
             // if data is function, bind to f.orig, passing f.dest and f.src
             f.orig.data = data.call(f.orig, f.dest, f.src);
